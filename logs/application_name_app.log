@@ -1,0 +1,5 @@
+DEBUG:MySQLPersistenceWrapper:2025-10-20 21:08:18,968:__init__:It works!
+DEBUG:MySQLPersistenceWrapper:2025-10-20 21:08:18,969:__init__: DB Connection Config Dict: {'database': 'database_name', 'user': 'database_username', 'host': 'localhost', 'port': 8889}
+DEBUG:AppServices:2025-10-20 21:08:18,969:__init__:It works!
+DEBUG:UserInterface:2025-10-20 21:08:18,969:__init__:It works!
+DEBUG:UserInterface:2025-10-20 21:08:18,970:start: User interface started!
