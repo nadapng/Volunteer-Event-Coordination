@@ -14,3 +14,10 @@ class AppServices(ApplicationBase):
 				   logfile_prefix_name=self.META["log_prefix"])
         self.DB = MySQLPersistenceWrapper(config)
         self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}:It works!')
+       
+       
+       
+if __name__ == "__main__":
+    print("__init__.py works!")
+    print("AppService started")
+    print("UserInterface started")
