@@ -7,16 +7,22 @@ from application_name.presentation_layer.user_interface import UserInterface
 
 
 def main():
-	"""Entry point."""
-	args = configure_and_parse_commandline_arguments()
+    """Entry point."""
+    args = configure_and_parse_commandline_arguments()
 
-	if args.configfile:
-		config = None
-		with open(args.configfile, 'r') as f:
-			config = json.loads(f.read())
+    if args.configfile:
+        config = None
+        with open(args.configfile, 'r') as f:
+            config = json.loads(f.read())
 
-	ui = UserInterface(config)
-	ui.start()
+        ui = UserInterface(config)
+        ui.DB.DB.create_volunteers_table()
+        ui.DB.DB.create_events_table()
+        ui.DB.DB.create_volunteer_event_xref_table()
+        ui.DB.DB.show_tables()
+        ui.start()
+
+
 			
 		
 

@@ -1,0 +1,9 @@
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:36:56,696:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:36:56,697:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:36:56,697:Creating connection pool...
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:46:15,726:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:46:15,727:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:46:15,760:Creating connection pool...
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:53:03,872:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:53:03,872:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-10-30 15:53:03,873:Creating connection pool...

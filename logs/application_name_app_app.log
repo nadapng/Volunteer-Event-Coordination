@@ -1,36 +1,5 @@
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:07:42,837:__init__: It works!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:07:42,858:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 8889}
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:07:42,860:Creating connection pool...
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:07:42,860:Problem creating connection pool: 'pool'
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:07:42,885:Check DB conf:
-{"connection": {"config": {"database": "volunteer_event_db", "user": "app_user", "password": "password123", "host": "localhost", "port": 8889, "use_pure": true}, "pool": {"name": "mypool", "size": 5, "reset_session": true}}}
-DEBUG:AppServices:2025-10-29 23:07:47,183:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:07:47,184:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:07:47,184:start: User interface started!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:14:12,949:__init__: It works!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:14:12,950:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306}
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:14:12,951:Creating connection pool...
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:14:12,951:Problem creating connection pool: 'pool'
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:14:12,952:Check DB conf:
-{"connection": {"config": {"database": "volunteer_event_db", "user": "app_user", "password": "password123", "host": "localhost", "port": 3306, "use_pure": true}, "pool": {"name": "mypool", "size": 5, "reset_session": true}}}
-DEBUG:AppServices:2025-10-29 23:14:13,124:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:14:13,124:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:14:13,125:start: User interface started!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:20:21,012:__init__: It works!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:20:21,012:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306}
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:20:21,013:Creating connection pool...
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:20:21,013:Problem creating connection pool: 'pool'
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:20:21,014:Check DB conf:
-{"connection": {"config": {"database": "volunteer_event_db", "user": "app_user", "password": "password123", "host": "localhost", "port": 3306, "use_pure": true}, "pool": {"name": "mypool", "size": 5, "reset_session": true}}}
-DEBUG:AppServices:2025-10-29 23:20:21,160:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:20:21,160:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:20:21,160:start: User interface started!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:23:19,146:__init__: It works!
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:23:19,147:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306}
-DEBUG:MySQLPersistenceWrapper:2025-10-29 23:23:19,148:Creating connection pool...
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:23:19,148:Problem creating connection pool: 'pool'
-ERROR:MySQLPersistenceWrapper:2025-10-29 23:23:19,148:Check DB conf:
-{"connection": {"config": {"database": "volunteer_event_db", "user": "app_user", "password": "password123", "host": "localhost", "port": 3306, "use_pure": true}, "pool": {"name": "mypool", "size": 5, "reset_session": true}}}
-DEBUG:AppServices:2025-10-29 23:23:19,421:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:23:19,421:__init__:It works!
-DEBUG:UserInterface:2025-10-29 23:23:19,422:start: User interface started!
+DEBUG:UserInterface:2025-10-31 15:21:38,406:__init__:It works!
+DEBUG:UserInterface:2025-10-31 15:21:38,514:start: User interface started!
+DEBUG:AppServices:2025-10-31 15:37:14,917:__init__:It works!
+DEBUG:UserInterface:2025-10-31 15:37:14,918:__init__:It works!
+DEBUG:UserInterface:2025-10-31 15:37:15,147:start: User interface started!

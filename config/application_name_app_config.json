@@ -1,25 +1,20 @@
 {
     "meta": {
-        "app_name": "Volunteer Event Coordination",
-        "log_prefix": "application_name_app",
-        "author": "Nada",
-        "version": "1.0"
+        "log_prefix": "application_name_app"
     },
-    "database": {
-        "connection": {
-            "config": {
-                "database": "volunteer_event_db",
-                "user": "app_user",
-                "password": "password123",
-                "host": "localhost",
-                "port": 3306,
-                "use_pure": true
-            },
-            "pool": {
-                "name": "mypool",
-                "size": 5,
-                "reset_session": true
-            }
+    "connection": {
+        "config": {
+            "database": "volunteer_event_db",
+            "user": "app_user",
+            "password": "password123",
+            "host": "localhost",
+            "port": 3306,
+            "use_pure": true
+        },
+        "pool": {
+            "name": "mypool",
+            "size": 5,
+            "reset_session": true
         }
     }
 }

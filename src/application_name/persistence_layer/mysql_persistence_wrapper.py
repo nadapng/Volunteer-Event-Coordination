@@ -1,108 +1,162 @@
-"""Defines the MySQLPersistenceWrapper class."""
-
-from application_name.application_base import ApplicationBase
-from mysql import connector
-from mysql.connector.pooling import MySQLConnectionPool
-import inspect
 import json
+import inspect
+import mysql.connector as connector
+from mysql.connector import pooling
+from application_name.application_base import ApplicationBase
 
 
 class MySQLPersistenceWrapper(ApplicationBase):
-    """Implements the MySQLPersistenceWrapper class."""
+    """Handles all database interactions"""
 
-    def __init__(self, config: dict) -> None:
-        """Initializes object."""
-        self._config_dict = config
-        self.META = config["meta"]
-        self.DATABASE = config["database"]
-        super().__init__(
-            subclass_name=self.__class__.__name__,
-            logfile_prefix_name=self.META["log_prefix"]
-        )
-        self._logger.log_debug(f'{inspect.currentframe().f_code.co_name}: It works!')
+    def __init__(self, config):
+        super().__init__(subclass_name=self.__class__.__name__,
+                         logfile_prefix_name="mysql_persistence_wrapper")
+        self.DATABASE = config["connection"]["config"]
 
-        # Database Configuration Constants
-        self.DB_CONFIG = {
-            'database': self.DATABASE["connection"]["config"]["database"],
-            'user': self.DATABASE["connection"]["config"]["user"],
-            'password': self.DATABASE["connection"]["config"]["password"],
-            'host': self.DATABASE["connection"]["config"]["host"],
-            'port': self.DATABASE["connection"]["config"]["port"]
-        }
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: It works!")
+        self._logger.log_debug(f"{inspect.currentframe().f_code.co_name}: DB Connection Config Dict: {self.DATABASE}")
 
-        self._logger.log_debug(
-            f'{inspect.currentframe().f_code.co_name}: DB Connection Config Dict: {self.DB_CONFIG}'
-        )
-
-        # Database Connection
-        self._connection_pool = self._initialize_database_connection_pool(self.DB_CONFIG)
-
-        # 🔹 اختبار الاتصال بقاعدة البيانات
         try:
-            test_conn = connector.connect(**self.DB_CONFIG)
-            if test_conn.is_connected():
-                print("✅ Database connection successful!")
-                test_conn.close()
-        except connector.Error as err:
-            print(f"❌ Database connection failed: {err}")
+            self._connection_pool = self._initialize_database_connection_pool(config)
+            print("✅ Database connection successful!")
+        except Exception as e:
+            print(f"❌ Database connection failed: {e}")
 
-        # SQL String Constants
-        self.SQL_SELECT_VOLUNTEERS = "SELECT * FROM volunteers"
-        self.SQL_INSERT_VOLUNTEER = (
-            "INSERT INTO volunteers (name, email, phone, role) VALUES (%s, %s, %s, %s)"
-        )
-
-    # MySQLPersistenceWrapper Methods
-    def get_all_volunteers(self):
-        """Fetch and print all volunteers from the database."""
+    # -------------------------------------------------------------------------
+    # Database pool initialization
+    # -------------------------------------------------------------------------
+    def _initialize_database_connection_pool(self, config):
+        """Creates a reusable connection pool"""
         try:
-            conn = self._connection_pool.get_connection()
-            cursor = conn.cursor()
-            cursor.execute(self.SQL_SELECT_VOLUNTEERS)
-            results = cursor.fetchall()
+            self._logger.log_debug("Creating connection pool...")
+            pool = pooling.MySQLConnectionPool(
+                pool_name=config["connection"]["pool"]["name"],
+                pool_size=config["connection"]["pool"]["size"],
+                pool_reset_session=config["connection"]["pool"]["reset_session"],
+                **self.DATABASE
+            )
+            return pool
+        except Exception as e:
+            self._logger.log_error(f"Problem creating connection pool: {e}")
+            self._logger.log_error(f"Check DB conf:\n{json.dumps(config['connection'], indent=4)}")
+            raise e
 
-            print("\n🧾 Volunteers List:")
-            if not results:
-                print("No volunteers found.")
-            else:
-                for row in results:
-                    print(row)
-
-            cursor.close()
-            conn.close()
-
-        except connector.Error as err:
-            print(f"❌ Database error: {err}")
-
+    # -------------------------------------------------------------------------
+    # Add volunteer (example)
+    # -------------------------------------------------------------------------
     def add_volunteer(self, name, email, phone, role):
-        """Add a new volunteer to the database."""
+        """Adds a volunteer record"""
         try:
             conn = self._connection_pool.get_connection()
             cursor = conn.cursor()
-            cursor.execute(self.SQL_INSERT_VOLUNTEER, (name, email, phone, role))
+            query = "INSERT INTO volunteers (name, email, phone, role) VALUES (%s, %s, %s, %s)"
+            cursor.execute(query, (name, email, phone, role))
             conn.commit()
             print(f"✅ Volunteer '{name}' added successfully!")
-            cursor.close()
-            conn.close()
         except connector.Error as err:
             print(f"❌ Failed to add volunteer: {err}")
+        finally:
+            cursor.close()
+            conn.close()
 
-    ##### Private Utility Methods #####
-    def _initialize_database_connection_pool(self, config: dict) -> MySQLConnectionPool:
-        """Initializes database connection pool."""
+    # -------------------------------------------------------------------------
+    # Show all tables
+    # -------------------------------------------------------------------------
+    def show_tables(self):
+        """Displays all tables in the connected database"""
         try:
-            self._logger.log_debug('Creating connection pool...')
-            cnx_pool = MySQLConnectionPool(
-                pool_name=self.DATABASE["pool"]["name"],
-                pool_size=self.DATABASE["pool"]["size"],
-                pool_reset_session=self.DATABASE["pool"]["reset_session"],
-                **config
-            )
-            self._logger.log_debug('Connection pool successfully created!')
-            return cnx_pool
-        except connector.Error as err:
-            self._logger.log_error(f'Problem creating connection pool: {err}')
-            self._logger.log_error(f'Check DB config:\n{json.dumps(self.DATABASE)}')
+            conn = self._connection_pool.get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SHOW TABLES;")
+            tables = cursor.fetchall()
+            print("\n📋 Tables in database:")
+            if tables:
+                for t in tables:
+                    print(f"   - {t[0]}")
+            else:
+                print("   (No tables found yet)")
         except Exception as e:
-            self._logger.log_error(f'Problem creating connection pool: {e}')
-            self._logger.log_error(f'Check DB conf:\n{json.dumps(self.DATABASE)}')
+            print(f"❌ Error showing tables: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+
+    # -------------------------------------------------------------------------
+    # Create volunteers table
+    # -------------------------------------------------------------------------
+    def create_volunteers_table(self):
+        """Creates the volunteers table if it doesn't exist"""
+        try:
+            conn = self._connection_pool.get_connection()
+            cursor = conn.cursor()
+            query = """
+            CREATE TABLE IF NOT EXISTS volunteers (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                email VARCHAR(100) UNIQUE NOT NULL,
+                phone VARCHAR(20),
+                role VARCHAR(50),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+            cursor.execute(query)
+            conn.commit()
+            print("✅ Table 'volunteers' created successfully!")
+        except Exception as e:
+            print(f"❌ Error creating volunteers table: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+
+    # -------------------------------------------------------------------------
+    # Create events table
+    # -------------------------------------------------------------------------
+    def create_events_table(self):
+        """Creates the events table if it doesn't exist"""
+        try:
+            conn = self._connection_pool.get_connection()
+            cursor = conn.cursor()
+            query = """
+            CREATE TABLE IF NOT EXISTS events (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(100) NOT NULL,
+                event_date DATE NOT NULL,
+                location VARCHAR(100),
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """
+            cursor.execute(query)
+            conn.commit()
+            print("✅ Table 'events' created successfully!")
+        except Exception as e:
+            print(f"❌ Error creating events table: {e}")
+        finally:
+            cursor.close()
+            conn.close()
+        # -------------------------------------------------------------------------
+    # Create volunteer_event_xref table
+    # -------------------------------------------------------------------------
+    def create_volunteer_event_xref_table(self):
+        """Creates the volunteer_event_xref table to link volunteers and events"""
+        try:
+            conn = self._connection_pool.get_connection()
+            cursor = conn.cursor()
+            query = """
+            CREATE TABLE IF NOT EXISTS volunteer_event_xref (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                volunteer_id INT NOT NULL,
+                event_id INT NOT NULL,
+                assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (volunteer_id) REFERENCES volunteers(id) ON DELETE CASCADE,
+                FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+            );
+            """
+            cursor.execute(query)
+            conn.commit()
+            print("✅ Table 'volunteer_event_xref' created successfully!")
+        except Exception as e:
+            print(f"❌ Error creating volunteer_event_xref table: {e}")
+        finally:
+            cursor.close()
+            conn.close()
