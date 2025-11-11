@@ -1,0 +1,8 @@
+DEBUG:UserInterface:2025-10-31 15:21:38,406:__init__:It works!
+DEBUG:UserInterface:2025-10-31 15:21:38,514:start: User interface started!
+DEBUG:AppServices:2025-10-31 15:37:14,917:__init__:It works!
+DEBUG:UserInterface:2025-10-31 15:37:14,918:__init__:It works!
+DEBUG:UserInterface:2025-10-31 15:37:15,147:start: User interface started!
+DEBUG:AppServices:2025-11-03 23:08:47,945:__init__:It works!
+DEBUG:UserInterface:2025-11-03 23:08:47,945:__init__:It works!
+DEBUG:UserInterface:2025-11-03 23:08:47,974:start: User interface started!

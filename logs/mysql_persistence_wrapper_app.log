@@ -1,6 +1,73 @@
-DEBUG:MySQLPersistenceWrapper:2025-10-31 15:21:38,188:__init__: It works!
-DEBUG:MySQLPersistenceWrapper:2025-10-31 15:21:38,190:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306, 'use_pure': True}
-DEBUG:MySQLPersistenceWrapper:2025-10-31 15:21:38,191:Creating connection pool...
-DEBUG:MySQLPersistenceWrapper:2025-10-31 15:37:14,571:__init__: It works!
-DEBUG:MySQLPersistenceWrapper:2025-10-31 15:37:14,572:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'app_user', 'password': 'password123', 'host': 'localhost', 'port': 3306, 'use_pure': True}
-DEBUG:MySQLPersistenceWrapper:2025-10-31 15:37:14,604:Creating connection pool...
+USE `volunteer_app`;
+
+-- Create Users table
+CREATE TABLE `users` (
+  `user_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `full_name` VARCHAR(120) NOT NULL,
+  `email` VARCHAR(160) NOT NULL,
+  `phone` VARCHAR(30) NULL,
+  `role` ENUM('admin','organizer','volunteer') DEFAULT 'volunteer',
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Create Events table
+CREATE TABLE `events` (
+  `event_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(150) NOT NULL,
+  `description` TEXT NULL,
+  `location` VARCHAR(150) NULL,
+  `starts_at` DATETIME NOT NULL,
+  `ends_at` DATETIME NOT NULL,
+  `capacity` INT(11) DEFAULT 0,
+  `created_by` INT(11) NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`event_id`),
+  KEY `created_by` (`created_by`),
+  CONSTRAINT `fk_events_createdby` FOREIGN KEY (`created_by`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Create Registrations table
+CREATE TABLE `registrations` (
+  `reg_id` INT(11) NOT NULL AUTO_INCREMENT,
+  `event_id` INT(11) NOT NULL,
+  `user_id` INT(11) NOT NULL,
+  `status` ENUM('registered','waitlist','cancelled') DEFAULT 'registered',
+  `registered_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`reg_id`),
+  UNIQUE KEY `uniq_event_user` (`event_id`,`user_id`),
+  CONSTRAINT `fk_reg_event` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+  CONSTRAINT `fk_reg_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+DEBUG:MySQLPersistenceWrapper:2025-11-10 20:58:19,061:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-11-10 20:58:19,063:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'vol_app_user', 'password': 'Password123!', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-11-10 20:58:19,064:Creating connection pool...
+ERROR:MySQLPersistenceWrapper:2025-11-10 20:58:19,427:Problem creating connection pool: 1045 (28000): Access denied for user 'vol_app_user'@'localhost' (using password: YES)
+ERROR:MySQLPersistenceWrapper:2025-11-10 20:58:19,428:Check DB conf:
+{
+    "config": {
+        "database": "volunteer_event_db",
+        "user": "vol_app_user",
+        "password": "Password123!",
+        "host": "localhost",
+        "port": 3306,
+        "use_pure": true
+    },
+    "pool": {
+        "name": "mypool",
+        "size": 5,
+        "reset_session": true
+    }
+}
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:01:48,629:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:01:48,630:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'vol_app_user', 'password': 'Password123!', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:01:48,630:Creating connection pool...
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:02:54,520:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:02:54,521:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'vol_app_user', 'password': 'Password123!', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:02:54,522:Creating connection pool...
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:03:47,059:__init__: It works!
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:03:47,060:__init__: DB Connection Config Dict: {'database': 'volunteer_event_db', 'user': 'vol_app_user', 'password': 'Password123!', 'host': 'localhost', 'port': 3306, 'use_pure': True}
+DEBUG:MySQLPersistenceWrapper:2025-11-10 21:03:47,060:Creating connection pool...

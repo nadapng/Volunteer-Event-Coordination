@@ -5,8 +5,8 @@
     "connection": {
         "config": {
             "database": "volunteer_event_db",
-            "user": "app_user",
-            "password": "password123",
+            "user": "vol_app_user",
+            "password": "Password123!",
             "host": "localhost",
             "port": 3306,
             "use_pure": true
