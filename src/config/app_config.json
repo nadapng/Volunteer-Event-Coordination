@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "log_prefix": "volunteer_event_coordination_app"
+  },
+  "connection": {
+    "config": {
+      "database": "volunteer_event_db",
+      "user": "vol_app_user",
+      "password": "Password123!",
+      "host": "localhost",
+      "port": 3306,
+      "use_pure": true
+    },
+    "pool": {
+      "name": "volunteer_event_coordination_db_pool",
+      "size": 10,
+      "reset_session": true
+    }
+  }
+}
