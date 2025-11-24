@@ -4,11 +4,11 @@
     },
     "connection": {
         "config": {
-            "database": "volunteer_event_db",
-            "user": "root",
-            "password": "root",
             "host": "localhost",
             "port": 3306,
+            "user": "root",
+            "password": "root",
+            "database": "volunteer_event_db",
             "use_pure": true
         },
         "pool": {
