@@ -1,11 +1,16 @@
 from mysql.connector import pooling
 from volunteer_event_coordination.application_base import ApplicationBase
+from volunteer_event_coordination.custom_logging import Logger
+
 
 
 class MySQLPersistenceWrapper(ApplicationBase):
 
     def __init__(self, config_dict):
         super().__init__("MySQLPersistenceWrapper", "mysql_persistence_db")
+
+        self.logger = Logger("MySQLPersistenceWrapper", "mysql_persistence")
+
 
         # Read connection settings
         self.config = config_dict.get("connection", {}).get("config", {})
