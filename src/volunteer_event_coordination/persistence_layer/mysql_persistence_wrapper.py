@@ -1,91 +1,85 @@
-import mysql.connector.pooling
+import mysql.connector
+from mysql.connector import Error
+
 
 class MySQLPersistenceWrapper:
+    def __init__(self, config):
+        try:
+            self.connection = mysql.connector.connect(
+                host=config["connection"]["config"]["host"],
+                port=config["connection"]["config"]["port"],
+                user=config["connection"]["config"]["user"],
+                password=config["connection"]["config"]["password"],
+                database=config["connection"]["config"]["database"],
+                use_pure=True
+            )
+        except Error as e:
+            print(f"Error connecting to database: {e}")
+            self.connection = None
 
-    def __init__(self, config_dict):
-        self.config = config_dict.get("connection", {}).get("config", {})
-        self.pool_settings = config_dict.get("connection", {}).get("pool", {})
-
-        # Create connection pool
-        self.connection_pool = mysql.connector.pooling.MySQLConnectionPool(
-            pool_name="volunteer_pool",
-            pool_size=self.pool_settings.get("size", 5),
-            **self.config
-        )
-
-    # -----------------------------
-    # Fetch ALL records
-    # -----------------------------
-    def fetch_all(self, table):
-        conn = self.connection_pool.get_connection()
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute(f"SELECT * FROM {table}")
-        results = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return results
-
-    # -----------------------------
-    # Create User
-    # -----------------------------
-    def create_user(self, user_data):
-        conn = self.connection_pool.get_connection()
-        cursor = conn.cursor()
-
-        sql = """
-            INSERT INTO users (first_name, last_name, email)
-            VALUES (%s, %s, %s)
-        """
-        values = (
-            user_data["first_name"],
-            user_data["last_name"],
-            user_data["email"]
-        )
-
-        cursor.execute(sql, values)
-        conn.commit()
-
-        cursor.close()
-        conn.close()
+    # -------------------------------------------------------------------------
+    # CREATE USER (tests expect boolean True)
+    # -------------------------------------------------------------------------
+    def create_user(self, data: dict):
+        self.insert_record("users", data)
         return True
 
-    # -----------------------------
-    # Update User
-    # -----------------------------
-    def update_user(self, user_id, updated_data):
-        conn = self.connection_pool.get_connection()
-        cursor = conn.cursor()
+    # -------------------------------------------------------------------------
+    # INSERT
+    # -------------------------------------------------------------------------
+    def insert_record(self, table_name, data: dict):
+        columns = ", ".join(data.keys())
+        placeholders = ", ".join(["%s"] * len(data))
 
-        sql = """
-            UPDATE users
-            SET first_name=%s, last_name=%s, email=%s
-            WHERE user_id=%s
-        """
-        values = (
-            updated_data["first_name"],
-            updated_data["last_name"],
-            updated_data["email"],
-            user_id
-        )
+        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
 
-        cursor.execute(sql, values)
-        conn.commit()
+        cursor = self.connection.cursor()
+        cursor.execute(query, tuple(data.values()))
+        self.connection.commit()
 
-        cursor.close()
-        conn.close()
-        return True
+        return cursor.lastrowid
 
-    # -----------------------------
-    # Delete User
-    # -----------------------------
-    def delete_user(self, user_id):
-        conn = self.connection_pool.get_connection()
-        cursor = conn.cursor()
+    # -------------------------------------------------------------------------
+    # GET BY ID  (tests call: get_by_id("users", "user_id", last_id))
+    # -------------------------------------------------------------------------
+    def get_by_id(self, table_name, id_column, id_value):
+        query = f"SELECT * FROM {table_name} WHERE {id_column} = %s"
 
-        sql = "DELETE FROM users WHERE user_id=%s"
-        cursor.execute(sql, (user_id,))
-        conn.commit()
+        cursor = self.connection.cursor()
+        cursor.execute(query, (id_value,))
+        return cursor.fetchone()
 
-        cursor.close()
-        conn.close()
-        return True
+    # -------------------------------------------------------------------------
+    # UPDATE (tests expect return True)
+    # -------------------------------------------------------------------------
+    def update_record(self, table_name, id_column, id_value, data: dict):
+        set_clause = ", ".join([f"{key} = %s" for key in data.keys()])
+        query = f"UPDATE {table_name} SET {set_clause} WHERE {id_column} = %s"
+
+        cursor = self.connection.cursor()
+        cursor.execute(query, (*data.values(), id_value))
+        self.connection.commit()
+
+        return True  # required by tests
+
+    # -------------------------------------------------------------------------
+    # DELETE (tests expect return True)
+    # -------------------------------------------------------------------------
+    def delete_record(self, table_name, id_column, id_value):
+        query = f"DELETE FROM {table_name} WHERE {id_column} = %s"
+
+        cursor = self.connection.cursor()
+        cursor.execute(query, (id_value,))
+        self.connection.commit()
+
+        return True  # required by tests
+
+    # -------------------------------------------------------------------------
+    # FETCH ALL (must return tuples NOT dicts)
+    # -------------------------------------------------------------------------
+    def fetch_all(self, table_name):
+        query = f"SELECT * FROM {table_name}"
+
+        cursor = self.connection.cursor()  # tuple mode
+        cursor.execute(query)
+        return cursor.fetchall()
