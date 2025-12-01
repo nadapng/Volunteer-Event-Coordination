@@ -3,8 +3,10 @@ import os
 
 class Logger:
 
-    def __init__(self, name, logfile_prefix):
-        logs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "logs"))
+    def __init__(self, name="App", logfile_prefix="app"):
+        logs_dir = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..", "logs")
+        )
         os.makedirs(logs_dir, exist_ok=True)
 
         logfile = os.path.join(logs_dir, f"{logfile_prefix}.log")
@@ -13,7 +15,9 @@ class Logger:
         self.logger.setLevel(logging.INFO)
 
         file_handler = logging.FileHandler(logfile)
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         file_handler.setFormatter(formatter)
 
         if not self.logger.handlers:

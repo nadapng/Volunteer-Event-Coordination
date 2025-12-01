@@ -4,6 +4,7 @@ import os
 class SettingsService:
 
     def __init__(self, config_path="config/app_config.json"):
+        # يبني مسار الملف الصحيح داخل SRC
         self.config_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", config_path)
         )
