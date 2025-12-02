@@ -1,85 +1,59 @@
 import mysql.connector
-from mysql.connector import Error
-
 
 class MySQLPersistenceWrapper:
     def __init__(self, config):
-        try:
-            self.connection = mysql.connector.connect(
-                host=config["connection"]["config"]["host"],
-                port=config["connection"]["config"]["port"],
-                user=config["connection"]["config"]["user"],
-                password=config["connection"]["config"]["password"],
-                database=config["connection"]["config"]["database"],
-                use_pure=True
-            )
-        except Error as e:
-            print(f"Error connecting to database: {e}")
-            self.connection = None
+        # Extract database config correctly
+        db_cfg = config["database"]["connection"]["config"]
 
-    # -------------------------------------------------------------------------
-    # CREATE USER (tests expect boolean True)
-    # -------------------------------------------------------------------------
-    def create_user(self, data: dict):
-        self.insert_record("users", data)
-        return True
+        # Create DB connection
+        self.connection = mysql.connector.connect(
+            host=db_cfg["host"],
+            user=db_cfg["user"],
+            password=db_cfg["password"],
+            database=db_cfg["database"],
+            port=db_cfg["port"],
+            use_pure=db_cfg["use_pure"]
+        )
 
-    # -------------------------------------------------------------------------
-    # INSERT
-    # -------------------------------------------------------------------------
-    def insert_record(self, table_name, data: dict):
+    def fetch_all(self, table):
+        cursor = self.connection.cursor()
+        cursor.execute(f"SELECT * FROM {table}")
+        result = cursor.fetchall()
+        cursor.close()
+        return result
+
+    def insert_record(self, table, data):
+        cursor = self.connection.cursor()
         columns = ", ".join(data.keys())
         placeholders = ", ".join(["%s"] * len(data))
-
-        query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
-
-        cursor = self.connection.cursor()
-        cursor.execute(query, tuple(data.values()))
+        sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+        cursor.execute(sql, tuple(data.values()))
         self.connection.commit()
+        last_id = cursor.lastrowid
+        cursor.close()
+        return last_id
 
-        return cursor.lastrowid
-
-    # -------------------------------------------------------------------------
-    # GET BY ID  (tests call: get_by_id("users", "user_id", last_id))
-    # -------------------------------------------------------------------------
-    def get_by_id(self, table_name, id_column, id_value):
-        query = f"SELECT * FROM {table_name} WHERE {id_column} = %s"
-
+    def get_by_id(self, table, key_column, key_value):
         cursor = self.connection.cursor()
-        cursor.execute(query, (id_value,))
-        return cursor.fetchone()
+        sql = f"SELECT * FROM {table} WHERE {key_column} = %s"
+        cursor.execute(sql, (key_value,))
+        result = cursor.fetchone()
+        cursor.close()
+        return result
 
-    # -------------------------------------------------------------------------
-    # UPDATE (tests expect return True)
-    # -------------------------------------------------------------------------
-    def update_record(self, table_name, id_column, id_value, data: dict):
-        set_clause = ", ".join([f"{key} = %s" for key in data.keys()])
-        query = f"UPDATE {table_name} SET {set_clause} WHERE {id_column} = %s"
-
+    def update_record(self, table, key_column, key_value, data):
         cursor = self.connection.cursor()
-        cursor.execute(query, (*data.values(), id_value))
+        set_clause = ", ".join([f"{col} = %s" for col in data.keys()])
+        sql = f"UPDATE {table} SET {set_clause} WHERE {key_column} = %s"
+        cursor.execute(sql, tuple(data.values()) + (key_value,))
         self.connection.commit()
+        cursor.close()
+        return True
 
-        return True  # required by tests
-
-    # -------------------------------------------------------------------------
-    # DELETE (tests expect return True)
-    # -------------------------------------------------------------------------
-    def delete_record(self, table_name, id_column, id_value):
-        query = f"DELETE FROM {table_name} WHERE {id_column} = %s"
-
+    def delete_record(self, table, key_column, key_value):
         cursor = self.connection.cursor()
-        cursor.execute(query, (id_value,))
+        sql = f"DELETE FROM {table} WHERE {key_column} = %s"
+        cursor.execute(sql, (key_value,))
         self.connection.commit()
-
-        return True  # required by tests
-
-    # -------------------------------------------------------------------------
-    # FETCH ALL (must return tuples NOT dicts)
-    # -------------------------------------------------------------------------
-    def fetch_all(self, table_name):
-        query = f"SELECT * FROM {table_name}"
-
-        cursor = self.connection.cursor()  # tuple mode
-        cursor.execute(query)
-        return cursor.fetchall()
+        cursor.close()
+        return True

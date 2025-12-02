@@ -1,98 +1,75 @@
 class UserInterface:
-    def __init__(self):
-        from volunteer_event_coordination.service_layer.app_services import AppServices
-        self.services = AppServices()
-
-    def display_menu(self):
-        print("\n" + "=" * 30)
-        print(" Volunteer Event Coordination")
-        print("=" * 30)
-        print("1. View all records")
-        print("2. Add a new record")
-        print("3. Update a record")
-        print("4. Delete a record")
-        print("5. Exit")
-        print("=" * 30)
+    def __init__(self, controller):
+        self.controller = controller
 
     def run(self):
         while True:
-            self.display_menu()
-            choice = input("Select an option: ")
+            print("\n====== Main Menu ======")
+            print("1) View Users")
+            print("2) Add User")
+            print("3) Update User")
+            print("4) Delete User")
+            print("5) Exit")
 
-            # ============================
-            # VIEW ALL RECORDS
-            # ============================
+            choice = input("\nSelect an option: ")
+
             if choice == "1":
-                users = self.services.get_all_users()
-
-                if not users:
-                    print("\nNo users found.\n")
-                else:
-                    print("\n====== Users List ======\n")
-                    for u in users:
-                        print(f"ID: {u['user_id']}")
-                        print(f"First Name: {u['first_name']}")
-                        print(f"Last Name: {u['last_name']}")
-                        print(f"Email: {u['email']}")
-                        print(f"Created At: {u['created_at']}")
-                        print("-----------------------------")
-
-            # ============================
-            # ADD NEW USER
-            # ============================
+                self.view_users()
             elif choice == "2":
-                first = input("Enter first name: ")
-                last = input("Enter last name: ")
-                email = input("Enter email: ")
-
-                self.services.create_user({
-                    "first_name": first,
-                    "last_name": last,
-                    "email": email
-                })
-
-                print("\nUser added successfully!\n")
-
-            # ============================
-            # UPDATE USER
-            # ============================
+                self.add_user()
             elif choice == "3":
-                user_id = input("Enter user ID to update: ")
-
-                first = input("Enter new first name: ")
-                last = input("Enter new last name: ")
-                email = input("Enter new email: ")
-
-                updated = self.services.update_user(user_id, {
-                    "first_name": first,
-                    "last_name": last,
-                    "email": email
-                })
-
-                if updated:
-                    print("\nUser updated successfully!\n")
-                else:
-                    print("\nUser not found.\n")
-
-            # ============================
-            # DELETE USER
-            # ============================
+                self.update_user()
             elif choice == "4":
-                user_id = input("Enter user ID to delete: ")
-
-                deleted = self.services.delete_user(user_id)
-
-                if deleted:
-                    print("\nUser deleted successfully!\n")
-                else:
-                    print("\nUser not found.\n")
-
-            # ============================
-            # EXIT
-            # ============================
+                self.delete_user()
             elif choice == "5":
-                print("Exiting program... Goodbye!")
+                print("Exiting...")
                 break
-
             else:
-                print("Invalid option. Please try again.\n")
+                print("Invalid choice. Please try again.")
+
+    def view_users(self):
+        print("\n====== Users List ======")
+        users = self.controller.get_all_users()
+
+        for u in users:
+            # tuple → dictionary
+            user_dict = {
+                "user_id": u[0],
+                "first_name": u[1],
+                "last_name": u[2],
+                "email": u[3],
+            }
+
+            print(
+                f"ID: {user_dict['user_id']}, "
+                f"First Name: {user_dict['first_name']}, "
+                f"Last Name: {user_dict['last_name']}, "
+                f"Email: {user_dict['email']}"
+            )
+
+    def add_user(self):
+        print("\n====== Add User ======")
+        first = input("First name: ")
+        last = input("Last name: ")
+        email = input("Email: ")
+
+        data = {"first_name": first, "last_name": last, "email": email}
+        self.controller.create_user(data)
+        print("User added successfully.")
+
+    def update_user(self):
+        print("\n====== Update User ======")
+        user_id = input("Enter user ID to update: ")
+        new_last = input("New last name: ")
+
+        self.controller.update_user(
+            "users", "user_id", user_id, {"last_name": new_last}
+        )
+        print("User updated successfully.")
+
+    def delete_user(self):
+        print("\n====== Delete User ======")
+        user_id = input("Enter user ID to delete: ")
+
+        self.controller.delete_user("users", "user_id", user_id)
+        print("User deleted successfully.")

@@ -7,8 +7,8 @@
       "config": {
         "host": "localhost",
         "user": "root",
-        "password": "",
-        "database": "volunteer-event-db",
+        "password": "root",
+        "database": "volunteer_event_db",
         "port": 3306,
         "use_pure": true
       }
