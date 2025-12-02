@@ -27,12 +27,14 @@ class UserInterface:
             else:
                 print("Invalid choice. Please try again.")
 
+    # -------------------------
+    # VIEW USERS
+    # -------------------------
     def view_users(self):
         print("\n====== Users List ======")
         users = self.controller.get_all_users()
 
         for u in users:
-            # tuple → dictionary
             user_dict = {
                 "user_id": u[0],
                 "first_name": u[1],
@@ -47,6 +49,9 @@ class UserInterface:
                 f"Email: {user_dict['email']}"
             )
 
+    # -------------------------
+    # ADD USER
+    # -------------------------
     def add_user(self):
         print("\n====== Add User ======")
         first = input("First name: ")
@@ -57,16 +62,38 @@ class UserInterface:
         self.controller.create_user(data)
         print("User added successfully.")
 
+    # -------------------------
+    # UPDATE USER (UPDATE ALL FIELDS)
+    # -------------------------
     def update_user(self):
         print("\n====== Update User ======")
         user_id = input("Enter user ID to update: ")
-        new_last = input("New last name: ")
 
-        self.controller.update_user(
-            "users", "user_id", user_id, {"last_name": new_last}
-        )
+        print("Enter NEW values (leave blank to keep current):")
+        new_first = input("New first name: ")
+        new_last = input("New last name: ")
+        new_email = input("New email: ")
+
+        # Build data dict dynamically
+        data = {}
+
+        if new_first.strip():
+            data["first_name"] = new_first
+        if new_last.strip():
+            data["last_name"] = new_last
+        if new_email.strip():
+            data["email"] = new_email
+
+        if not data:
+            print("No changes provided. Update canceled.")
+            return
+
+        self.controller.update_user("users", "user_id", user_id, data)
         print("User updated successfully.")
 
+    # -------------------------
+    # DELETE USER
+    # -------------------------
     def delete_user(self):
         print("\n====== Delete User ======")
         user_id = input("Enter user ID to delete: ")
